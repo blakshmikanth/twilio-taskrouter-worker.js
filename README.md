@@ -26,7 +26,7 @@ Releases of twilio-taskrouter-worker.js are hosted on a CDN, and you can include
 directly in your web app using a &lt;script&gt; tag.
 
 ```html
-<script src="//media.twiliocdn.com/sdk/js/taskrouter-worker/v1/twilio-taskrouter-worker.min.js"></script>
+<script src="//media.twiliocdn.com/sdk/js/taskrouter-worker/v2/twilio-taskrouter-worker.min.js"></script>
 ```
 
 Usage
@@ -39,8 +39,8 @@ For more information, refer to the
 ```js
 const alice = new Twilio.TaskRouter.Worker(token);
 
-alice.on('ready', () => {
-    console.log('Worker ' + alice.sid + ' is now ready for work');
+alice.on('ready', (readyAlice) => {
+    console.log('Worker ' + readyAlice.sid + ' is now ready for work');
 });
 
 alice.on('reservationCreated', (reservation) => {
