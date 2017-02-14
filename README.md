@@ -34,7 +34,7 @@ Usage
 
 The following is a simple example showing a Worker waiting for Reservations.
 For more information, refer to the
-[API Docs](//media.twiliocdn.com/sdk/js/taskrouter-worker/v1/docs).
+[API Docs](//media.twiliocdn.com/sdk/js/taskrouter-worker/v2/docs).
 
 ```js
 const alice = new Twilio.TaskRouter.Worker(token);
@@ -66,12 +66,12 @@ alice.on('reservationCreated', (reservation) => {
 Changelog
 ---------
 
-See [CHANGELOG.md](https://code.hq.twilio.com/wli/twilio-taskrouter-worker.js/blob/2.0.0-prev/CHANGELOG.md).
+See [CHANGELOG.md](https://github.com/twilio/twilio-taskrouter-worker.js/blob/master/CHANGELOG.md).
 
 License
 -------
 
-See [LICENSE.md](https://code.hq.twilio.com/wli/twilio-taskrouter-worker.js/blob/2.0.0-prev/LICENSE.md).
+See [LICENSE.md](https://github.com/twilio/twilio-taskrouter-worker.js/blob/master/LICENSE.md).
 
 Building
 --------
