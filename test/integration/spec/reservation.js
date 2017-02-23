@@ -10,7 +10,7 @@ const Configuration = require('../../../lib/util/configuration');
 const credentials = require('../../env').NonMultiTask;
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
-const JWT = require('../../util/makeJWTToken');
+const JWT = require('../../util/makeAccessToken');
 const Logger = require('../../../lib/util/logger');
 const Task = require('../../../lib/task');
 const testTools = require('../../util/testTools');
@@ -18,9 +18,20 @@ const Worker = require('../../../lib/worker');
 
 describe('Reservation', function() {
   const taskSids = [];
+  let aliceToken;
+  let bobToken;
 
-  const aliceToken = JWT.getJWTToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerAlice, 'prod');
-  const bobToken = JWT.getJWTToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerBob, 'prod');
+  before(function(done) {
+    JWT.getAccessToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerAlice).then(function(accessToken) {
+      aliceToken = accessToken;
+    });
+
+    JWT.getAccessToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerBob).then(function(accessToken) {
+      bobToken = accessToken;
+    });
+
+    setTimeout(done, 1000);
+  });
 
   afterEach(function(done) {
     while (taskSids.length !== 0) {

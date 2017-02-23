@@ -12,7 +12,7 @@ const nonMultiTaskCreds = credentials.NonMultiTask;
 const multiTaskCreds = credentials.MultiTask;
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
-const JWT = require('../../util/makeJWTToken');
+const JWT = require('../../util/makeAccessToken');
 const Logger = require('../../../lib/util/logger');
 const Task = require('../../../lib/task');
 const testTools = require('../../util/testTools');
@@ -22,11 +22,30 @@ describe('Client', function() {
   const taskSids = [];
   const taskSidsMulti = [];
 
-  const aliceToken = JWT.getJWTToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerAlice, 'prod');
-  const bobToken = JWT.getJWTToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerBob, 'prod');  
+  let aliceToken;
+  let bobToken;
+  let aliceMultiToken;
+  let bobMultiToken;
 
-  const aliceMultiToken = JWT.getJWTToken(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerAlice, 'prod');
-  const bobMultiToken = JWT.getJWTToken(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerBob, 'prod');
+  before(function(done) {
+    JWT.getAccessToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerAlice).then(function(accessToken) {
+      aliceToken = accessToken;
+    });
+
+    JWT.getAccessToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerBob).then(function(accessToken) {
+      bobToken = accessToken;
+    });
+
+    JWT.getAccessToken(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerAlice).then(function(accessToken) {
+      aliceMultiToken = accessToken;
+    });
+
+    JWT.getAccessToken(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerBob).then(function(accessToken) {
+      bobMultiToken = accessToken;
+    });
+
+    setTimeout(done, 1000);
+  });
 
   const workerChannelsMultiTask = {
     'default': { capacity: 3, available: true },
@@ -331,10 +350,12 @@ describe('Client', function() {
 
       alice.on('tokenUpdated', spy);
 
-      const updatedAliceToken = JWT.getJWTToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerAlice, 'prod');
-      alice.updateToken(updatedAliceToken);
-      assert.equal(alice._config.token, updatedAliceToken);
-      assert.isTrue(spy.calledOnce);
+      let updateAliceToken;
+      JWT.getAccessToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerAlice).then(function(accessToken) {
+        alice.updateToken(updatedAliceToken);
+        expect(alice._config.token).to.equal(updatedAliceToken);
+        expect(spy.calledOnce).to.be.true;
+      });
     });
 
     it('should return an error if unable to update the token', function() {
