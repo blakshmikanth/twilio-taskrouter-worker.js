@@ -1,6 +1,8 @@
 twilio-taskrouter-worker.js
 ===============
 
+[![Build Status](https://travis-ci.org/twilio/twilio-taskrouter-worker.js.svg?branch=master)](https://travis-ci.org/twilio/twilio-taskrouter-worker.js)
+
 twilio-taskrouter-worker.js allows you to manage Workers in the browser.
 
 Note that this is a preview release. You may encounter bugs and instability, and
