@@ -114,6 +114,7 @@ describe('Client', function() {
 
   describe('initialization of Multi Task Worker', function() {
     it('should populate .activities', function() {
+      this.timeout(5000);
       const multiTaskAlice = new Worker(aliceMultiToken);
 
       return new Promise(function(resolve) {
@@ -125,6 +126,7 @@ describe('Client', function() {
     });
 
     it('should populate .channels', function() {
+      this.timeout(5000);
       const multiTaskAlice = new Worker(aliceMultiToken);
 
       return new Promise(function(resolve) {
@@ -141,6 +143,7 @@ describe('Client', function() {
     });
 
     it('should set the activty on connect if provided', () => {
+      this.timeout(5000);
       const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
 
       return new Promise((resolve) => {
@@ -159,6 +162,7 @@ describe('Client', function() {
     })
 
     it('should only have one of .activities as the current activity', function() {
+      this.timeout(5000);
       const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
 
       return new Promise(function(resolve) {
@@ -193,7 +197,7 @@ describe('Client', function() {
       testTools.updateWorkerActivity(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerAlice, multiTaskCreds.ConnectActivitySid);
 
       for (let i = 0; i < 3; i++) {
-        testTools.createTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkflowSid, { "selected_language": "en" }).then(function(taskPayload) {
+        testTools.createTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkflowSid, '{ "selected_language": "en" }').then(function(taskPayload) {
           taskSidsMulti.push(taskPayload.sid);
         });
       }
@@ -201,7 +205,7 @@ describe('Client', function() {
     });
 
     it('should populate pending .reservations', function() {
-      this.timeout(3000);
+      this.timeout(5000);
       const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
       
       return new Promise(function(resolve) {
@@ -220,6 +224,7 @@ describe('Client', function() {
 
   describe('initialization of Non Multi Task Worker', function() {
     it('should populate .activities', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken);
 
       return new Promise(function(resolve) {
@@ -231,6 +236,7 @@ describe('Client', function() {
     });
 
     it('should populate .channels', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken);
 
       return new Promise(function(resolve) {
@@ -247,6 +253,7 @@ describe('Client', function() {
     });
 
     it('should set the activty on connect if provided', () => {
+      this.timeout(5000);
       const alice = new Worker(aliceToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
 
       return new Promise((resolve) => {
@@ -265,6 +272,7 @@ describe('Client', function() {
     })
 
     it('should only have one of .activities as the current activity', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
 
       return new Promise(function(resolve) {
@@ -282,6 +290,7 @@ describe('Client', function() {
     });
 
     it('should populate .reservations with 0 Reservations when none currenty pending', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
 
       return new Promise(function(resolve) {
@@ -298,7 +307,7 @@ describe('Client', function() {
       testTools.updateWorkerActivity(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerBob, nonMultiTaskCreds.ConnectActivitySid);
 
       for (let i = 0; i < 2; i++) {
-        testTools.createTask(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }
@@ -306,7 +315,7 @@ describe('Client', function() {
     });
 
     it('should populate pending .reservations', function() {
-      this.timeout(3000);
+      this.timeout(5000);
       const bob = new Worker(bobToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
       
       return new Promise(function(resolve) {
@@ -319,6 +328,7 @@ describe('Client', function() {
 
   describe('#setAttributes(newAttributes)', function() {
     it('should set the attributes of the worker', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken);
       const newAttributes = { languages:['en'], name: 'Ms. Alice' };
       const spy = sinon.spy();
@@ -333,6 +343,7 @@ describe('Client', function() {
     });
 
     it('should return an error if unable to set the attributes', () => {
+      this.timeout(5000);
       const alice = new Worker(aliceToken);
       const badAttributes = 'a string of attributes';
 
@@ -345,6 +356,7 @@ describe('Client', function() {
 
   describe('#updateToken(newToken)', function() {
     it('should update the token on the Signaling instance', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken);
       const spy = sinon.spy();
 
@@ -359,6 +371,7 @@ describe('Client', function() {
     });
 
     it('should return an error if unable to update the token', function() {
+      this.timeout(5000);
       const alice = new Worker(aliceToken);
       const badTokenError = Errors.INVALID_TOKEN.clone('Twilio token malformed. Unable to decode token.');
       const badToken = 'asdfasdf';
@@ -371,7 +384,7 @@ describe('Client', function() {
   describe('#getTasks()', function() {
     before(function(done) {
       for (let i = 0; i < 2; i++) {
-        testTools.createTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSidsMulti.push(taskPayload.sid);
         });
       }
@@ -380,7 +393,6 @@ describe('Client', function() {
 
     it('should get the Task instances', function() {
       this.timeout(5000);
-
       const multiTaskBob = new Worker(bobMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
 
       return new Promise(function(resolve) {
@@ -392,5 +404,4 @@ describe('Client', function() {
       });
     });
   });
-
 });

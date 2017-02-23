@@ -18,6 +18,7 @@ const Worker = require('../../../lib/worker');
 
 describe('Reservation', function() {
   const taskSids = [];
+
   let aliceToken;
   let bobToken;
 
@@ -30,17 +31,13 @@ describe('Reservation', function() {
       bobToken = accessToken;
     });
 
-    setTimeout(done, 1000);
-  });
-
-  afterEach(function(done) {
     while (taskSids.length !== 0) {
       testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
     }
     setTimeout(done, 1000);
   });
 
-  before(function(done) {
+  afterEach(function(done) {
     while (taskSids.length !== 0) {
       testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
     }
@@ -57,8 +54,8 @@ describe('Reservation', function() {
   describe('constructor', function() {
     before(function(done) {
       for (let i = 0; i < 2; i++) {
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "en" }).then(function(taskPayload) {
-          taskSids.push(taskPayload.sid);
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "en" }').then(function(task) {
+          taskSids.push(task.sid);
         });
       }
       setTimeout(done, 1000);
@@ -91,13 +88,14 @@ describe('Reservation', function() {
     });
 
     it('should create a Reservation instance', function() {
+      this.timeout(5000);
 
       return new Promise(function(resolve) {
         bob.on('reservationCreated', function(reservation) {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
@@ -123,12 +121,13 @@ describe('Reservation', function() {
     });
 
     it('should get the Task instance', function() {
+      this.timeout(5000);
       return new Promise(function(resolve) {
         bob.on('reservationCreated', function(reservation) {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
@@ -153,12 +152,13 @@ describe('Reservation', function() {
     });
 
     it('should accept the Reservation', function() {
+      this.timeout(5000);
       return new Promise(function(resolve) {
         bob.on('reservationCreated', function(reservation) {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
@@ -181,12 +181,13 @@ describe('Reservation', function() {
     });
 
     it('should reject the Reservation', function() {
+      this.timeout(5000);
       return new Promise(function(resolve) {
         bob.on('reservationCreated', function(reservation) {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
@@ -198,12 +199,13 @@ describe('Reservation', function() {
     });
 
     it('should reject the Reservation with options', function() {
+      this.timeout(5000);
       return new Promise(function(resolve) {
         bob.on('reservationCreated', function(reservation) {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "es" }).then(function(taskPayload) {
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {

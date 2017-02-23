@@ -1,6 +1,6 @@
 'use strict';
 
-const Twilio = require('../../twilio-node');
+const Twilio = require('twilio');
 const AccessToken = Twilio.jwt.AccessToken;
 const TaskRouterGrant = AccessToken.TaskRouterGrant;
 

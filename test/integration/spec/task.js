@@ -27,7 +27,7 @@ describe('Task', function() {
 
     setTimeout(done, 1000);
   });
- 
+
   afterEach(function(done) {
     while (taskSids.length !== 0) {
       testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
@@ -46,12 +46,13 @@ describe('Task', function() {
     });
 
     it('should update the Task', function() {
+      this.timeout(5000);
       return new Promise(function(resolve) {
         alice.on('reservationCreated', function(reservation) {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, { "selected_language": "en" }).then(function(taskPayload) {
+        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "en" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {

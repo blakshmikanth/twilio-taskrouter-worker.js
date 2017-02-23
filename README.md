@@ -4,7 +4,9 @@ twilio-taskrouter-worker.js
 twilio-taskrouter-worker.js allows you to manage Workers in the browser.
 
 Note that this is a preview release. You may encounter bugs and instability, and
-the APIs available in this release may change in subsequent releases.
+the APIs available in this release may change in subsequent releases. This library
+uses the next-generation version of [twilio-node](https://github.com/twilio/twilio-node/tree/next-gen).
+You can read more about the next-gen version of twilio-node on our [Docs page](https://www.twilio.com/docs/libraries/node#installation-nextgen).
 
 **We want your feedback!** Email Kris Gutta, Product Manager for TaskRouter
 at [kgutta@twilio.com](mailto:kgutta@twilio.com) with suggested

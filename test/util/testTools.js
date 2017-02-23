@@ -3,57 +3,29 @@
 const Twilio = require('twilio');
 
 module.exports.createTask = function(accountSid, authToken, workspaceSid, workflowSid, attributes) {
-  const client = new Twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
+  const client = new Twilio(accountSid, authToken);
 
-  return new Promise(function(resolve, reject) {
-    client.workspace.tasks.create({
-      attributes: JSON.stringify(attributes),
-      workflowSid: workflowSid
-    }, function(err, data) {
-      if (err) {
-        reject(err);
-      }
-      resolve(data);
-    });
-  });
+  return client.taskrouter.v1.workspaces(workspaceSid).tasks.create({ workflowSid: workflowSid, attributes: attributes });
 };
 
 module.exports.deleteTask = function(accountSid, authToken, workspaceSid, taskSid) {
-  const client = new Twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
+  const client = new Twilio(accountSid, authToken);
 
-  return new Promise(function(resolve, reject) {
-    client.workspace.tasks(taskSid).delete(function(err, data) {
-      if (err) {
-        reject(err);
-      }
-      resolve(data);
-    });
-  });
+  return client.taskrouter.v1.workspaces(workspaceSid).tasks(taskSid).remove();
 };
 
 module.exports.deleteAllTasks = function(accountSid, authToken, workspaceSid) {
-  const client = new Twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
-  
-  client.workspace.tasks.list(function(err, data) {
-    if (data) {
-      data.tasks.forEach(function(task) {
-          client.workspace.tasks(task.sid).delete();
-      });
-    }
+  const client = new Twilio(accountSid, authToken);
+
+  client.taskrouter.v1.workspaces(workspaceSid).tasks.list().then(function(tasks) {
+    tasks.forEach(function(task) {
+      task.remove();
+    });
   });
 };
 
 module.exports.updateWorkerActivity = function(accountSid, authToken, workspaceSid, workerSid, activitySid) {
-  const client = new Twilio.TaskRouterClient(accountSid, authToken, workspaceSid);
+  const client = new Twilio(accountSid, authToken);
 
-  return new Promise(function(resolve, reject) {
-    client.workspace.workers(workerSid).update({
-      activitySid: activitySid
-    }, function(err, worker) {
-      if (err) {
-        reject(err);
-      }
-      resolve(worker);
-    });
-  });
+  return client.taskrouter.v1.workspaces(workspaceSid).workers(workerSid).update({ activitySid: activitySid });
 };
