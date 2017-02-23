@@ -23,17 +23,19 @@
     "lint": "eslint ./lib",
     "test:unit": "mocha ./test/unit/index.js",
     "test:integration": "mocha ./test/integration/index.js",
+    "test:integration:travis": "node ./scripts/integration.js",
     "test": "run-s test:unit test:integration",
     "build:js": "node ./scripts/build.js ./src/twilio-taskrouter-worker.js ./LICENSE.md ./dist/twilio-taskrouter-worker.js",
     "build:min.js": "uglifyjs ./dist/twilio-taskrouter-worker.js -o ./dist/twilio-taskrouter-worker.min.js --comments \"/^! twilio-taskrouter-worker.js/\"",
     "build": "npm-run-all clean lint docs cover test:integration build:js build:min.js",
+    "build:travis": "npm-run-all clean lint docs cover test:integration:travis build:js build:min.js",
     "docs": "node ./scripts/docs.js ./dist/docs",
     "clean": "rimraf ./coverage ./dist",
     "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- ./test/unit/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://code.hq.twilio.com/wli/twilio-taskrouter-worker.js.git"
+    "url": "https://github.com/twilio/twilio-taskrouter-worker.js.git"
   },
   "dependencies": {
     "babel-runtime": "^6.22.0",

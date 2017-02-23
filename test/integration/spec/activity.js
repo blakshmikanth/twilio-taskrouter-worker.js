@@ -7,7 +7,7 @@ const expect = chai.expect;
 const sinon = require('sinon');
 
 const Configuration = require('../../../lib/util/configuration');
-const credentials = require('../../env').NonMultiTask;
+const credentials = require('../../env');
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
 const JWT = require('../../util/makeAccessToken');
@@ -16,19 +16,13 @@ const Worker = require('../../../lib/worker');
 
 describe('Activity', function() {
 
-  let token;
-  before(function(done) {
-    JWT.getAccessToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerAlice).then(function(accessToken) {
-      token = accessToken;
-    });
-    setTimeout(done, 1000);
-  });
+  let token = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskAliceSid);
 
   describe('#setAsCurrent', function() {
     it('should set this particular activity as the current of the Worker', function() {
       this.timeout(5000);
       
-      const worker = new Worker(token, { connectActivitySid: credentials.ConnectActivitySid });
+      const worker = new Worker(token, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       let idleActivity;
       let readyActivity;

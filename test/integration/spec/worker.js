@@ -8,8 +8,6 @@ const sinon = require('sinon');
 
 const Configuration = require('../../../lib/util/configuration');
 const credentials = require('../../env');
-const nonMultiTaskCreds = credentials.NonMultiTask;
-const multiTaskCreds = credentials.MultiTask;
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
 const JWT = require('../../util/makeAccessToken');
@@ -22,30 +20,10 @@ describe('Client', function() {
   const taskSids = [];
   const taskSidsMulti = [];
 
-  let aliceToken;
-  let bobToken;
-  let aliceMultiToken;
-  let bobMultiToken;
-
-  before(function(done) {
-    JWT.getAccessToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerAlice).then(function(accessToken) {
-      aliceToken = accessToken;
-    });
-
-    JWT.getAccessToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerBob).then(function(accessToken) {
-      bobToken = accessToken;
-    });
-
-    JWT.getAccessToken(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerAlice).then(function(accessToken) {
-      aliceMultiToken = accessToken;
-    });
-
-    JWT.getAccessToken(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerBob).then(function(accessToken) {
-      bobMultiToken = accessToken;
-    });
-
-    setTimeout(done, 1000);
-  });
+  let aliceToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskAliceSid);
+  let bobToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskBobSid);
+  let aliceMultiToken = JWT.getAccessToken(credentials.accountSid, credentials.multiTaskWorkspaceSid, credentials.multiTaskAliceSid);
+  let bobMultiToken = JWT.getAccessToken(credentials.accountSid, credentials.multiTaskWorkspaceSid, credentials.multiTaskBobSid);
 
   const workerChannelsMultiTask = {
     'default': { capacity: 3, available: true },
@@ -63,33 +41,32 @@ describe('Client', function() {
     'video': { capacity: 1, available: true }
   };
 
-  afterEach(function(done) {
-    while (taskSids.length !== 0) {
-      testTools.deleteTask(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, taskSids.pop());
-    }
-    while (taskSidsMulti.length !== 0) {
-      testTools.deleteTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, taskSidsMulti.pop());
-    }
-
-    setTimeout(done, 1000);
-  });
-
   before(function(done) {
     while (taskSids.length !== 0) {
-      testTools.deleteTask(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, taskSids.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
     }
     while (taskSidsMulti.length !== 0) {
-      testTools.deleteTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, taskSidsMulti.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.multiTaskWorkspaceSid, taskSidsMulti.pop());
     }
     setTimeout(done, 1000);
   });
 
   after(function(done) {
     while (taskSids.length !== 0) {
-      testTools.deleteTask(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, taskSids.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
     }
     while (taskSidsMulti.length !== 0) {
-      testTools.deleteTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, taskSidsMulti.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.multiTaskWorkspaceSid, taskSidsMulti.pop());
+    }
+    setTimeout(done, 1000);
+  });
+
+  afterEach(function(done) {
+    while (taskSids.length !== 0) {
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
+    }
+    while (taskSidsMulti.length !== 0) {
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.multiTaskWorkspaceSid, taskSidsMulti.pop());
     }
     setTimeout(done, 1000);
   });
@@ -144,7 +121,7 @@ describe('Client', function() {
 
     it('should set the activty on connect if provided', () => {
       this.timeout(5000);
-      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
+      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: credentials.multiTaskConnectActivitySid });
 
       return new Promise((resolve) => {
         multiTaskAlice.on('ready', resolve);
@@ -163,7 +140,7 @@ describe('Client', function() {
 
     it('should only have one of .activities as the current activity', function() {
       this.timeout(5000);
-      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
+      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: credentials.multiTaskConnectActivitySid });
 
       return new Promise(function(resolve) {
         multiTaskAlice.on('ready', resolve);
@@ -181,7 +158,7 @@ describe('Client', function() {
 
     it('should populate .reservations with 0 Reservations when none currenty pending', function() {
       this.timeout(5000);
-      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
+      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: credentials.multiTaskConnectActivitySid });
 
       return new Promise(function(resolve) {
         multiTaskAlice.on('ready', resolve);
@@ -194,10 +171,10 @@ describe('Client', function() {
   describe('Multi Task Worker with pending Reservations', function() {
     before(function(done) {
       // turn the worker online so that Reservations can be created
-      testTools.updateWorkerActivity(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkerAlice, multiTaskCreds.ConnectActivitySid);
+      testTools.updateWorkerActivity(credentials.accountSid, credentials.authToken, credentials.multiTaskWorkspaceSid, credentials.multiTaskAliceSid, credentials.multiTaskConnectActivitySid);
 
       for (let i = 0; i < 3; i++) {
-        testTools.createTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkflowSid, '{ "selected_language": "en" }').then(function(taskPayload) {
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.multiTaskWorkspaceSid, credentials.multiTaskWorkflowSid, '{ "selected_language": "en" }').then(function(taskPayload) {
           taskSidsMulti.push(taskPayload.sid);
         });
       }
@@ -206,7 +183,7 @@ describe('Client', function() {
 
     it('should populate pending .reservations', function() {
       this.timeout(5000);
-      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
+      const multiTaskAlice = new Worker(aliceMultiToken, { connectActivitySid: credentials.multiTaskConnectActivitySid });
       
       return new Promise(function(resolve) {
         multiTaskAlice.on('ready', resolve);
@@ -254,7 +231,7 @@ describe('Client', function() {
 
     it('should set the activty on connect if provided', () => {
       this.timeout(5000);
-      const alice = new Worker(aliceToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
+      const alice = new Worker(aliceToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       return new Promise((resolve) => {
         alice.on('ready', resolve);
@@ -273,7 +250,7 @@ describe('Client', function() {
 
     it('should only have one of .activities as the current activity', function() {
       this.timeout(5000);
-      const alice = new Worker(aliceToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
+      const alice = new Worker(aliceToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       return new Promise(function(resolve) {
         alice.on('ready', resolve);
@@ -291,7 +268,7 @@ describe('Client', function() {
 
     it('should populate .reservations with 0 Reservations when none currenty pending', function() {
       this.timeout(5000);
-      const alice = new Worker(aliceToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
+      const alice = new Worker(aliceToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       return new Promise(function(resolve) {
         alice.on('ready', resolve);
@@ -304,10 +281,10 @@ describe('Client', function() {
   describe('Non Multi Task Worker with pending Reservations', function() {
     before(function(done) {
       // turn the worker online so that Reservations can be created
-      testTools.updateWorkerActivity(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerBob, nonMultiTaskCreds.ConnectActivitySid);
+      testTools.updateWorkerActivity(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskBobSid, credentials.nonMultiTaskConnectActivitySid);
 
       for (let i = 0; i < 2; i++) {
-        testTools.createTask(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }
@@ -316,7 +293,7 @@ describe('Client', function() {
 
     it('should populate pending .reservations', function() {
       this.timeout(5000);
-      const bob = new Worker(bobToken, { connectActivitySid: nonMultiTaskCreds.ConnectActivitySid });
+      const bob = new Worker(bobToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
       
       return new Promise(function(resolve) {
         bob.on('ready', resolve);
@@ -362,12 +339,10 @@ describe('Client', function() {
 
       alice.on('tokenUpdated', spy);
 
-      let updateAliceToken;
-      JWT.getAccessToken(nonMultiTaskCreds.AccountSid, nonMultiTaskCreds.AuthToken, nonMultiTaskCreds.WorkspaceSid, nonMultiTaskCreds.WorkerAlice).then(function(accessToken) {
-        alice.updateToken(updatedAliceToken);
-        expect(alice._config.token).to.equal(updatedAliceToken);
-        expect(spy.calledOnce).to.be.true;
-      });
+      let updateAliceToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskAliceSid);
+      alice.updateToken(updateAliceToken);
+      assert.equal(alice._config.token, updateAliceToken);
+      assert.isTrue(spy.calledOnce);
     });
 
     it('should return an error if unable to update the token', function() {
@@ -384,7 +359,7 @@ describe('Client', function() {
   describe('#getTasks()', function() {
     before(function(done) {
       for (let i = 0; i < 2; i++) {
-        testTools.createTask(multiTaskCreds.AccountSid, multiTaskCreds.AuthToken, multiTaskCreds.WorkspaceSid, multiTaskCreds.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.multiTaskWorkspaceSid, credentials.multiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
           taskSidsMulti.push(taskPayload.sid);
         });
       }
@@ -393,7 +368,7 @@ describe('Client', function() {
 
     it('should get the Task instances', function() {
       this.timeout(5000);
-      const multiTaskBob = new Worker(bobMultiToken, { connectActivitySid: multiTaskCreds.ConnectActivitySid });
+      const multiTaskBob = new Worker(bobMultiToken, { connectActivitySid: credentials.multiTaskConnectActivitySid });
 
       return new Promise(function(resolve) {
         multiTaskBob.on('ready', resolve);

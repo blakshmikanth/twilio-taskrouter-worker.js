@@ -7,7 +7,7 @@ const expect = chai.expect;
 const sinon = require('sinon');
 
 const Configuration = require('../../../lib/util/configuration');
-const credentials = require('../../env').NonMultiTask;
+const credentials = require('../../env');
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
 const JWT = require('../../util/makeAccessToken');
@@ -19,34 +19,26 @@ const Worker = require('../../../lib/worker');
 describe('Reservation', function() {
   const taskSids = [];
 
-  let aliceToken;
-  let bobToken;
+  let aliceToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskAliceSid);
+  let bobToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskBobSid)
 
   before(function(done) {
-    JWT.getAccessToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerAlice).then(function(accessToken) {
-      aliceToken = accessToken;
-    });
-
-    JWT.getAccessToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerBob).then(function(accessToken) {
-      bobToken = accessToken;
-    });
-
     while (taskSids.length !== 0) {
-      testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
-    }
-    setTimeout(done, 1000);
-  });
-
-  afterEach(function(done) {
-    while (taskSids.length !== 0) {
-      testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
     }
     setTimeout(done, 1000);
   });
 
   after(function(done) {
     while (taskSids.length !== 0) {
-      testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
+    }
+    setTimeout(done, 1000);
+  });
+
+  afterEach(function(done) {
+    while (taskSids.length !== 0) {
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
     }
     setTimeout(done, 1000);
   });
@@ -54,8 +46,9 @@ describe('Reservation', function() {
   describe('constructor', function() {
     before(function(done) {
       for (let i = 0; i < 2; i++) {
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "en" }').then(function(task) {
-          taskSids.push(task.sid);
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid,
+          credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "en" }').then(function(task) {
+            taskSids.push(task.sid);
         });
       }
       setTimeout(done, 1000);
@@ -64,7 +57,7 @@ describe('Reservation', function() {
     it('should set the Reservation as pending', function() {
       this.timeout(3000);
 
-      const alice = new Worker(aliceToken, { connectActivitySid: credentials.ConnectActivitySid });
+      const alice = new Worker(aliceToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
       
       return new Promise(function(resolve) {
         alice.on('ready', resolve);
@@ -80,7 +73,7 @@ describe('Reservation', function() {
   describe('Event:on(\'reservationCreated\')', function() {
     let bob;
     before(function(done) {
-      bob = new Worker(bobToken, { connectActivitySid: credentials.ConnectActivitySid });
+      bob = new Worker(bobToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       bob.on('ready', function(readyBob) {
         done();
@@ -95,8 +88,9 @@ describe('Reservation', function() {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
-          taskSids.push(taskPayload.sid);
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid,
+          credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+            taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
         assert.equal(bob.reservations.size, 1);
@@ -113,7 +107,7 @@ describe('Reservation', function() {
   describe('#getTask()', function() {
     let bob;
     beforeEach(function(done) {
-      bob = new Worker(bobToken, { connectActivitySid: credentials.ConnectActivitySid });
+      bob = new Worker(bobToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       bob.on('ready', function(readyBob) {
         done();
@@ -127,8 +121,9 @@ describe('Reservation', function() {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
-          taskSids.push(taskPayload.sid);
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid,
+          credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+            taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
         return reservation.getTask().then(function(task) {
@@ -144,7 +139,7 @@ describe('Reservation', function() {
   describe('#accept()', function() {
     let bob;
     beforeEach(function(done) {
-      bob = new Worker(bobToken, { connectActivitySid: credentials.ConnectActivitySid });
+      bob = new Worker(bobToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       bob.on('ready', function(readyBob) {
         done();
@@ -158,8 +153,9 @@ describe('Reservation', function() {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
-          taskSids.push(taskPayload.sid);
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid,
+          credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+            taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
         return reservation.accept().then(function(updatedReservation) {
@@ -173,7 +169,7 @@ describe('Reservation', function() {
   describe('#reject(options)', function() {
     let bob;
     beforeEach(function(done) {
-      bob = new Worker(bobToken, { connectActivitySid: credentials.ConnectActivitySid });
+      bob = new Worker(bobToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       bob.on('ready', function(readyBob) {
         done();
@@ -187,8 +183,9 @@ describe('Reservation', function() {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
-          taskSids.push(taskPayload.sid);
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid,
+          credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+            taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
         return reservation.reject().then(function(updatedReservation) {
@@ -205,11 +202,12 @@ describe('Reservation', function() {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
-          taskSids.push(taskPayload.sid);
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid,
+          credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "es" }').then(function(taskPayload) {
+            taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {
-        return reservation.reject({ activitySid: credentials.DisconnectActivitySid }).then(function(updatedReservation) {
+        return reservation.reject({ activitySid: credentials.nonMultiTaskDisconnectActivitySid }).then(function(updatedReservation) {
           expect(reservation).to.equal(updatedReservation);
           expect(reservation.status).equal('rejected');
 

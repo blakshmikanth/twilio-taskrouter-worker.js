@@ -7,7 +7,7 @@ const expect = chai.expect;
 const sinon = require('sinon');
 
 const Configuration = require('../../../lib/util/configuration');
-const credentials = require('../../env').NonMultiTask;
+const credentials = require('../../env');
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
 const JWT = require('../../util/makeAccessToken');
@@ -18,19 +18,11 @@ const Worker = require('../../../lib/worker');
 
 describe('Task', function() {
   const taskSids = [];
-  let aliceToken;
-
-  before(function(done) {
-    JWT.getAccessToken(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkerAlice).then(function(accessToken) {
-      aliceToken = accessToken;
-    });
-
-    setTimeout(done, 1000);
-  });
+  let aliceToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskAliceSid);
 
   afterEach(function(done) {
     while (taskSids.length !== 0) {
-      testTools.deleteTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, taskSids.pop());
+      testTools.deleteTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, taskSids.pop());
     }
     setTimeout(done, 1000);
   });
@@ -38,7 +30,7 @@ describe('Task', function() {
   describe('#complete(reason)', function() {
     let alice;
     beforeEach(function(done) {
-      alice = new Worker(aliceToken, { connectActivitySid: credentials.ConnectActivitySid });
+      alice = new Worker(aliceToken, { connectActivitySid: credentials.nonMultiTaskConnectActivitySid });
 
       alice.on('ready', function(readyAlice) {
         done();
@@ -52,7 +44,7 @@ describe('Task', function() {
           resolve(reservation);
         });
 
-        testTools.createTask(credentials.AccountSid, credentials.AuthToken, credentials.WorkspaceSid, credentials.WorkflowSid, '{ "selected_language": "en" }').then(function(taskPayload) {
+        testTools.createTask(credentials.accountSid, credentials.authToken, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskWorkflowSid, '{ "selected_language": "en" }').then(function(taskPayload) {
           taskSids.push(taskPayload.sid);
         });
       }).then(function(reservation) {

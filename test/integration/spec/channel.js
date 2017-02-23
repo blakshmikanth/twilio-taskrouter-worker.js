@@ -8,8 +8,6 @@ const sinon = require('sinon');
 
 const Configuration = require('../../../lib/util/configuration');
 const credentials = require('../../env');
-const credsMulti = credentials.MultiTask;
-const credsNonMulti = credentials.NonMultiTask;
 const Errors = require('../../../lib/util/constants').twilioErrors;
 const fakePayloads = require('../../util/fakeWorkerResponses').fakePayloads;
 const JWT = require('../../util/makeAccessToken');
@@ -18,20 +16,8 @@ const Worker = require('../../../lib/worker');
 
 describe('Channel', function() {
 
-  let multiTaskToken;
-  let nonMultiTaskToken;
-
-  before(function(done) {
-    JWT.getAccessToken(credsMulti.AccountSid, credsMulti.AuthToken, credsMulti.WorkspaceSid, credsMulti.WorkerAlice).then(function(accessToken) {
-      multiTaskToken = accessToken;
-    });
-
-    JWT.getAccessToken(credsNonMulti.AccountSid, credsNonMulti.AuthToken, credsNonMulti.WorkspaceSid, credsNonMulti.WorkerAlice).then(function(accessToken) {
-      nonMultiTaskToken = accessToken;
-    });
-
-    setTimeout(done, 1000);
-  });
+  let multiTaskToken = JWT.getAccessToken(credentials.accountSid, credentials.multiTaskWorkspaceSid, credentials.multiTaskAliceSid);
+  let nonMultiTaskToken = JWT.getAccessToken(credentials.accountSid, credentials.nonMultiTaskWorkspaceSid, credentials.nonMultiTaskAliceSid);
 
   const workerChannelsMultiTask = {
     'default': { capacity: 3, available: true },
