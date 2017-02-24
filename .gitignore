@@ -1,0 +1,8 @@
+node_modules
+docs
+bin
+dist
+build
+*.swp
+.idea
+.vscode
