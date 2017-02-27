@@ -1,8 +1,6 @@
 twilio-taskrouter-worker.js
 ===============
 
-[![Build Status](https://travis-ci.org/twilio/twilio-taskrouter-worker.js.svg?branch=master)](https://travis-ci.org/twilio/twilio-taskrouter-worker.js)
-
 twilio-taskrouter-worker.js allows you to manage Workers in the browser.
 
 Note that this is a preview release. You may encounter bugs and instability, and
@@ -18,19 +16,13 @@ support, contact [help@twilio.com](mailto:help@twilio.com).
 Installation
 ------------
 
-### NPM
-
-```
-npm install twilio-taskrouter-worker --save
-```
-
 ### CDN
 
 Releases of twilio-taskrouter-worker.js are hosted on a CDN, and you can include these
 directly in your web app using a &lt;script&gt; tag.
 
 ```html
-<script src="//media.twiliocdn.com/sdk/js/taskrouter-worker/v2/twilio-taskrouter-worker.min.js"></script>
+<script src="//media.twiliocdn.com/taskrouter/js/v2/twilio-taskrouter-worker.min.js"></script>
 ```
 
 Usage
@@ -38,7 +30,7 @@ Usage
 
 The following is a simple example showing a Worker waiting for Reservations.
 For more information, refer to the
-[API Docs](//media.twiliocdn.com/sdk/js/taskrouter-worker/v2/docs).
+[API Docs](//media.twiliocdn.com/taskrouter/js/v2/docs).
 
 ```js
 const alice = new Twilio.TaskRouter.Worker(token);
@@ -98,5 +90,4 @@ Contributing
 ------------
 
 Bug fixes welcome! If you're not familiar with the GitHub pull
-request/contribution process,
-[this is a nice tutorial](https://gun.io/blog/how-to-github-fork-branch-and-pull-request/).
+request/contribution process, [this is a nice tutorial](https://gun.io/blog/how-to-github-fork-branch-and-pull-request/).

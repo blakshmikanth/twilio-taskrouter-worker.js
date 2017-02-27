@@ -1,7 +1,7 @@
 {
   "name": "twilio-taskrouter-worker",
   "title": "Twilio TaskRouter Worker",
-  "version": "2.0.0-dev",
+  "version": "2.0.0-preview1",
   "description": "Twilio TaskRouter Worker JavaScript library",
   "homepage": "https://twilio.com",
   "author": "Wanjun Li <wli@twilio.com>",
@@ -31,7 +31,7 @@
     "build:travis": "npm-run-all clean lint docs cover test:integration:travis build:js build:min.js",
     "docs": "node ./scripts/docs.js ./dist/docs",
     "clean": "rimraf ./coverage ./dist",
-    "cover": "istanbul cover ./node_modules/mocha/bin/_mocha -- ./test/unit/index.js"
+    "cover": "istanbul cover _mocha -- ./test/unit/index.js"
   },
   "repository": {
     "type": "git",
@@ -63,6 +63,7 @@
     "jsdoc": "^3.4.3",
     "mocha": "^3.1.2",
     "npm-run-all": "^4.0.1",
+    "release-tool": "^0.2.2",
     "rimraf": "^2.5.4",
     "sinon": "^1.17.6",
     "sinon-as-promised": "^4.0.2",
